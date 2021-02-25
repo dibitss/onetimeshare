@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # SQLite
-.db
+*.db
 
 # VSCode
 .vscode/
