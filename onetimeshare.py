@@ -1,20 +1,25 @@
 import os
 import uuid
+import sqlalchemy
 
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_utils import StringEncryptedType
+from sqlalchemy_utils.types.encrypted.encrypted_type import AesEngine
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 database_file = "sqlite:///{}".format(os.path.join(project_dir, "onetimeshare.db"))
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = database_file
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+secret_key = '12345'
 
 db = SQLAlchemy(app)
 
 class Secret(db.Model):
-    secret = db.Column(db.String(80), nullable=False)
+    secret = db.Column(StringEncryptedType(sqlalchemy.Unicode, secret_key, AesEngine, 'pkcs5'), nullable=False)
     sid = db.Column(db.String(32), unique=True, nullable=False, primary_key=True)
 
     def __repr__(self):
