@@ -1,9 +1,11 @@
 <html>
   <body>
     <form method="POST" action="/">
-      <input type="password" name="secret">
+      <input type="password" name="secret" placeholder="Your secret here">
+      <input type="datetime-local" name="expiration" required>
+      <span class="validity"></span>
       <input type="submit" value="Get Link">
-      <p><b>{{url}}{{sid}}</b></p>
+      <p>{{url}}{{sid}}</b></p>
     </form>
   </body>
 </html>
