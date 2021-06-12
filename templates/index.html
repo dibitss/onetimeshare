@@ -2,7 +2,7 @@
   <body>
     <form method="POST" action="/">
       <input type="password" name="secret" placeholder="Your secret here">
-      <input type="datetime-local" name="expiration" required>
+      <input type="datetime-local" name="expiration"  min={{now}} value={{suggested}} required>
       <span class="validity"></span>
       <input type="submit" value="Get Link">
       <p>{{url}}{{sid}}</b></p>

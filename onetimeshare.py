@@ -2,7 +2,7 @@ import os
 import uuid
 import sqlalchemy
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy_utils import StringEncryptedType
@@ -40,7 +40,10 @@ def add_secret():
         db.session.commit()
         url = request.base_url
     
-    return render_template('index.html', sid=sid, url=url)
+    now_str = datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M')
+    suggested_expiration_str = datetime.strftime(datetime.now() + timedelta(hours=1), '%Y-%m-%dT%H:%M')
+    
+    return render_template('index.html', sid=sid, url=url, now=now_str, suggested=suggested_expiration_str)
   
 @app.route('/<sid>', methods=['GET'])
 def get_secret(sid):
