@@ -1,11 +1,33 @@
+<!DOCTYPE html>
 <html>
-  <body>
-    <form method="POST" action="/">
-      <input type="password" name="secret" placeholder="Your secret here">
-      <input type="datetime-local" name="expiration"  min={{now}} value={{suggested}} required>
-      <span class="validity"></span>
-      <input type="submit" value="Get Link">
-    </form>
-    <code>{{url}}{{sid}}</code>
-  </body>
+<head>
+    <title>OneTimeShare - Secure Secret Sharing</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure one-time secret sharing service">
+</head>
+<body>
+    <div class="container">
+        <h1>OneTimeShare</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('add_secret') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <textarea name="secret" placeholder="Enter your secret message here..." required rows="4"></textarea>
+            <input type="datetime-local" name="expiration" min="{{now}}" value="{{suggested}}" required>
+            <button type="submit">Generate Secret Link</button>
+        </form>
+        {% if url and sid %}
+        <div class="result">
+            <p>Your secret link:</p>
+            <code>{{url}}{{sid}}</code>
+        </div>
+        {% endif %}
+    </div>
+</body>
 </html>

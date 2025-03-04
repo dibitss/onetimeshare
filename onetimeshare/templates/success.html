@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="success">
+    <h2>Your secret link:</h2>
+    <p>Share this link with the intended recipient. The secret will be deleted after it is viewed or expires.</p>
+    <pre>{{ secret_url }}</pre>
+</div>
+{% endblock %} 

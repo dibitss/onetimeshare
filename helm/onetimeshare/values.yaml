@@ -1,0 +1,106 @@
+replicaCount: 1
+
+image:
+  repository: onetimeshare
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 5000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 1Gi
+
+config:
+  maxSecretSize: 10240  # 10KB
+  workerCount: 4
+  cleanupInterval: 3600  # 1 hour in seconds
+  database:
+    type: sqlite  # can be "sqlite" or "postgresql"
+    # SQLite configuration (used when type is "sqlite")
+    sqlite:
+      path: "/data/onetimeshare.db"
+    # PostgreSQL configuration (used when type is "postgresql")
+    postgresql:
+      host: ""  # Set this when using external PostgreSQL
+      port: 5432
+      database: "onetimeshare"
+      user: "onetimeshare"
+      password: ""  # Set this when using external PostgreSQL
+      sslMode: "require"
+
+# PostgreSQL subchart configuration
+postgresql:
+  enabled: false  # Set to true to deploy PostgreSQL as part of the release
+  auth:
+    database: "onetimeshare"
+    username: "onetimeshare"
+    password: ""  # Required when postgresql.enabled is true
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+  service:
+    ports:
+      postgresql: 5432
+
+secrets:
+  secretKey: ""  # Required: Generate a secure secret key
+  encryptionKey: ""  # Required: Generate a secure encryption key
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {} 

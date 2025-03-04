@@ -1,0 +1,177 @@
+:root {
+    --neon-pink: #ff2e88;
+    --neon-blue: #00fff9;
+    --dark-bg: #0a0a0f;
+    --darker-bg: #050507;
+    --text-color: #e0e0e0;
+    --error-red: #ff4444;
+    --success-green: #00ff00;
+}
+
+body {
+    background: var(--dark-bg);
+    color: var(--text-color);
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    background: var(--darker-bg);
+    border: 1px solid var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue),
+                inset 0 0 10px var(--neon-blue);
+    padding: 2rem;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+h1 {
+    color: var(--neon-pink);
+    text-shadow: 0 0 5px var(--neon-pink);
+    margin-bottom: 2rem;
+    font-size: 2.5rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+textarea, input {
+    background: var(--darker-bg);
+    border: 1px solid var(--neon-blue);
+    color: var(--text-color);
+    padding: 0.8rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    resize: vertical;
+}
+
+textarea:focus, input:focus {
+    outline: none;
+    box-shadow: 0 0 5px var(--neon-blue);
+}
+
+button, .button {
+    background: var(--darker-bg);
+    color: var(--neon-blue);
+    border: 1px solid var(--neon-blue);
+    padding: 1rem 2rem;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:hover, .button:hover {
+    background: var(--neon-blue);
+    color: var(--darker-bg);
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.result {
+    margin-top: 2rem;
+    padding: 1rem;
+    border: 1px solid var(--neon-pink);
+    border-radius: 4px;
+    word-break: break-all;
+}
+
+.secret-text {
+    color: var(--neon-pink);
+    font-size: 1.2rem;
+    margin: 1rem 0;
+    word-break: break-word;
+    background: rgba(255, 46, 136, 0.1);
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.flash-message {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 0.9rem;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.flash-message.error {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid var(--error-red);
+    color: var(--error-red);
+}
+
+.flash-message.success {
+    background: rgba(0, 255, 0, 0.1);
+    border: 1px solid var(--success-green);
+    color: var(--success-green);
+}
+
+.warning {
+    color: var(--error-red);
+    font-size: 0.9rem;
+    margin: 1rem 0;
+}
+
+code {
+    display: block;
+    padding: 1rem;
+    background: rgba(0, 255, 249, 0.1);
+    border: 1px solid var(--neon-blue);
+    border-radius: 4px;
+    margin: 1rem 0;
+    word-break: break-all;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glitch {
+    0% {
+        text-shadow: 0.05em 0 0 var(--neon-pink), -0.05em -0.025em 0 var(--neon-blue);
+    }
+    14% {
+        text-shadow: 0.05em 0 0 var(--neon-pink), -0.05em -0.025em 0 var(--neon-blue);
+    }
+    15% {
+        text-shadow: -0.05em -0.025em 0 var(--neon-pink), 0.025em 0.025em 0 var(--neon-blue);
+    }
+    49% {
+        text-shadow: -0.05em -0.025em 0 var(--neon-pink), 0.025em 0.025em 0 var(--neon-blue);
+    }
+    50% {
+        text-shadow: 0.025em 0.05em 0 var(--neon-pink), 0.05em 0 0 var(--neon-blue);
+    }
+    99% {
+        text-shadow: 0.025em 0.05em 0 var(--neon-pink), 0.05em 0 0 var(--neon-blue);
+    }
+    100% {
+        text-shadow: -0.025em 0 0 var(--neon-pink), -0.025em -0.025em 0 var(--neon-blue);
+    }
+}
+
+h1:hover {
+    animation: glitch 1s infinite;
+} 

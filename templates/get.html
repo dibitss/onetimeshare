@@ -1,5 +1,15 @@
+<!DOCTYPE html>
 <html>
-  <body>
-    <p><b>{{secret.secret}}</b></p>
-  </body>
+<head>
+    <title>OneTimeShare - View Secret</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <h1>Secret Message</h1>
+        <div class="secret-text">{{secret.secret}}</div>
+        <p><small>This message will be destroyed after viewing.</small></p>
+    </div>
+</body>
 </html>

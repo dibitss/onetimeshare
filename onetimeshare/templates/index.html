@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+        <label for="secret">Enter your secret:</label><br>
+        <textarea name="secret" id="secret" required></textarea>
+    </div>
+    <div>
+        <label for="expiration">Expiration time:</label><br>
+        <input type="datetime-local" name="expiration" id="expiration" 
+               value="{{ suggested }}" 
+               min="{{ now }}" required>
+    </div>
+    <button type="submit">Create Secret Link</button>
+</form>
+{% endblock %} 

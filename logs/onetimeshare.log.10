@@ -1,0 +1,164 @@
+2025-03-04 15:42:38,161 [ERROR] Unhandled error: 400 Bad Request: The CSRF token is missing.
+Traceback (most recent call last):
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask_wtf/csrf.py", line 261, in protect
+    validate_csrf(self._get_csrf_token())
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask_wtf/csrf.py", line 100, in validate_csrf
+    raise ValidationError("The CSRF token is missing.")
+wtforms.validators.ValidationError: The CSRF token is missing.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask/app.py", line 915, in full_dispatch_request
+    rv = self.preprocess_request()
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask/app.py", line 1291, in preprocess_request
+    rv = self.ensure_sync(before_func)()
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask_wtf/csrf.py", line 229, in csrf_protect
+    self.protect()
+    ~~~~~~~~~~~~^^
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask_wtf/csrf.py", line 264, in protect
+    self._error_response(e.args[0])
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/demian/repos/personal/onetimeshare/.venv/lib/python3.13/site-packages/flask_wtf/csrf.py", line 307, in _error_response
+    raise CSRFError(reason)
+flask_wtf.csrf.CSRFError: 400 Bad Request: The CSRF token is missing.
+2025-03-04 15:42:38,248 [INFO] OneTimeShare startup
+2025-03-04 15:42:38,248 [INFO] OneTimeShare startup
+2025-03-04 15:42:38,279 [INFO] Database initialization completed successfully
+2025-03-04 15:42:38,279 [INFO] Database initialization completed successfully
+2025-03-04 15:42:38,288 [INFO] Secrets table created successfully
+2025-03-04 15:42:38,288 [INFO] Secrets table created successfully
+2025-03-04 15:42:38,868 [INFO] OneTimeShare startup
+2025-03-04 15:42:38,868 [INFO] OneTimeShare startup
+2025-03-04 15:42:38,868 [INFO] OneTimeShare startup
+2025-03-04 15:42:38,912 [INFO] Database initialization completed successfully
+2025-03-04 15:42:38,912 [INFO] Database initialization completed successfully
+2025-03-04 15:42:38,912 [INFO] Database initialization completed successfully
+2025-03-04 15:42:38,919 [INFO] Secrets table created successfully
+2025-03-04 15:42:38,919 [INFO] Secrets table created successfully
+2025-03-04 15:42:38,919 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,160 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,160 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,160 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,160 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,195 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,195 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,195 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,195 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,203 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,203 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,203 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,203 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,308 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,308 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,308 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,308 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,308 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,342 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,342 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,342 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,342 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,342 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,357 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,357 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,357 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,357 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,357 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,483 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,483 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,483 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,483 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,483 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,483 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,526 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,526 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,526 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,526 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,526 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,526 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,553 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,553 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,553 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,553 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,553 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,553 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,719 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,764 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,782 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,964 [INFO] OneTimeShare startup
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,989 [INFO] Database initialization completed successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:39,996 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,103 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,125 [INFO] Database initialization completed successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,136 [INFO] Secrets table created successfully
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup
+2025-03-04 15:42:40,858 [INFO] OneTimeShare startup

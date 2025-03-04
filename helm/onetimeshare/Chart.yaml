@@ -1,0 +1,21 @@
+apiVersion: v2
+name: onetimeshare
+description: A Helm chart for OneTimeShare - A secure, one-time secret sharing service
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - secret-sharing
+  - security
+  - flask
+maintainers:
+  - name: OneTimeShare Team
+home: https://github.com/yourusername/onetimeshare
+sources:
+  - https://github.com/yourusername/onetimeshare
+
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: https://charts.bitnami.com/bitnami
+    condition: postgresql.enabled 
