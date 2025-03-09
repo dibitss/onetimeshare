@@ -14,7 +14,7 @@ from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from apscheduler.schedulers.background import BackgroundScheduler
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 import sqlalchemy.exc
 
 from config import config
@@ -159,8 +159,8 @@ def create_app(test_config=None):
             logger.info("Database initialization completed successfully")
 
             # Test database connection and verify table exists
-            result = db.session.execute(text('SELECT name FROM sqlite_master WHERE type="table" AND name="secrets"')).fetchone()
-            if result:
+            inspector = inspect(db.engine)
+            if 'secrets' in inspector.get_table_names():
                 logger.info("Secrets table created successfully")
             else:
                 logger.error("Secrets table was not created")

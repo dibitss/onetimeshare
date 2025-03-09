@@ -10,6 +10,7 @@ RUN apt-get update \
         gcc \
         python3-dev \
         libffi-dev \
+        libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Create and activate virtual environment

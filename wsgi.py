@@ -1,14 +1,22 @@
 """WSGI entry point for OneTimeShare."""
+import os
 from onetimeshare import create_app
 
-# Create the application instance with development configuration
+# Determine configuration based on environment
+config_name = os.environ.get('FLASK_CONFIG', 'default')
+if os.environ.get('SQLALCHEMY_DATABASE_URI'):
+    config_name = 'docker'
+
+# Create the application instance
 app = create_app({
-    'SQLALCHEMY_DATABASE_URI': 'sqlite:///data/onetimeshare.db',
-    'SECRET_KEY': 'dev',
+    'SQLALCHEMY_DATABASE_URI': os.environ.get(
+        'SQLALCHEMY_DATABASE_URI',
+        'sqlite:///data/onetimeshare.db'
+    ),
+    'SECRET_KEY': os.environ.get('SECRET_KEY', 'dev'),
     'WTF_CSRF_ENABLED': True,
-    'MAX_CONTENT_LENGTH': 16 * 1024,  # 16KB max-limit
-    'RATELIMIT_ENABLED': True,
-    'SERVER_NAME': None,  # Allow any server name in development
+    'MAX_CONTENT_LENGTH': 16 * 1024,  # 16KB
+    'SERVER_NAME': None,  # Allow any server name
     'SESSION_COOKIE_SECURE': False,  # Allow non-HTTPS in development
     'SESSION_COOKIE_HTTPONLY': True,
     'SESSION_COOKIE_SAMESITE': 'Lax',
