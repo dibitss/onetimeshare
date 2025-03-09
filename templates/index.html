@@ -8,26 +8,84 @@
 </head>
 <body>
     <div class="container">
-        <h1>OneTimeShare</h1>
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">{{ message }}</div>
+                    <div class="message {{ category }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form method="POST" action="{{ url_for('onetimeshare.add_secret') }}">
+        
+        <form id="secretForm" method="POST" action="{{ url_for('onetimeshare.add_secret') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <textarea name="secret" placeholder="Enter your secret message here..." required rows="4"></textarea>
+            <textarea name="secret" placeholder="Enter your secret message here..." required></textarea>
             <input type="datetime-local" name="expiration" min="{{now}}" value="{{suggested}}" required>
             <button type="submit">Generate Secret Link</button>
         </form>
-        {% if url and sid %}
-        <div class="result">
-            <p>Your secret link:</p>
-            <code>{{url}}{{sid}}</code>
+        
+        <div id="secretLinkContainer" class="secret-link{% if url %} visible{% endif %}">
+            <a href="{{ url }}" id="secretLink">{% if url %}{{ url }}{% endif %}</a>
         </div>
-        {% endif %}
     </div>
+
+    <div id="toast" class="toast" style="display: none">Copied to clipboard!</div>
+
+    <script>
+        document.getElementById('secretForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const csrfToken = formData.get('csrf_token');
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-Token': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'An error occurred');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                const container = document.getElementById('secretLinkContainer');
+                const link = document.getElementById('secretLink');
+                link.href = data.url;
+                link.textContent = data.url;
+                container.classList.add('visible');
+                this.reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const message = document.createElement('div');
+                message.className = 'message error';
+                message.textContent = error.message || 'An error occurred while creating the secret.';
+                this.parentNode.insertBefore(message, this);
+                setTimeout(() => message.remove(), 5000);
+            });
+        });
+
+        // Copy functionality with toast notification
+        document.getElementById('secretLinkContainer').addEventListener('click', function(e) {
+            e.preventDefault();
+            const link = document.getElementById('secretLink');
+            navigator.clipboard.writeText(link.href).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        });
+    </script>
 </body>
 </html>

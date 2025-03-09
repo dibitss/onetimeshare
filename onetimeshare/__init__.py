@@ -7,7 +7,7 @@ import secrets
 from cryptography.fernet import Fernet
 import base64
 
-from flask import Flask, session, render_template, request, abort, flash, url_for, jsonify, current_app
+from flask import Flask, session, render_template, request, abort, flash, url_for, jsonify, current_app, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -40,7 +40,7 @@ def create_app(test_config=None):
                 static_folder='../static',
                 static_url_path='/static',
                 template_folder='../templates')
-    
+
     # Default configuration
     app.config.from_mapping(
         SECRET_KEY=os.environ.get('SECRET_KEY', os.urandom(32).hex()),
@@ -54,7 +54,8 @@ def create_app(test_config=None):
         ENCRYPTION_KEY=os.environ.get('ENCRYPTION_KEY', Fernet.generate_key().decode()),
         PERMANENT_SESSION_LIFETIME=timedelta(minutes=5),
         WTF_CSRF_ENABLED=True,  # Enable CSRF protection by default
-        WTF_CSRF_TIME_LIMIT=3600  # 1 hour CSRF token expiry
+        WTF_CSRF_TIME_LIMIT=3600,  # 1 hour CSRF token expiry
+        SEND_FILE_MAX_AGE_DEFAULT=0  # Disable caching for development
     )
 
     # Generate a Fernet key if not provided
@@ -75,28 +76,31 @@ def create_app(test_config=None):
     # Load test config if passed in
     if test_config is not None:
         app.config.update(test_config)
-    
+
     # Configure logging
     app.logger.setLevel(logging.DEBUG)
-    
+
     # Ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
     except OSError:
         pass
-    
+
     # Initialize extensions
     db.init_app(app)
-    csrf.init_app(app)  # Initialize CSRF protection
+    csrf.init_app(app)
     limiter.init_app(app)
-    talisman.init_app(app)
-    
+    talisman.init_app(app, force_https=False, content_security_policy=None)
+
     # Register error handlers
     @app.errorhandler(CSRFError)
     def handle_csrf_error(e):
         """Handle CSRF errors."""
-        return jsonify({'error': 'CSRF token missing or invalid'}), 400
-    
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'CSRF token missing or invalid'}), 400
+        flash('Invalid form submission. Please try again.', 'error')
+        return redirect(url_for('onetimeshare.home'))
+
     # Configure logging
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):
@@ -119,41 +123,41 @@ def create_app(test_config=None):
         try:
             db_uri = app.config['SQLALCHEMY_DATABASE_URI']
             logger.debug(f"Initializing database with URI: {db_uri}")
-            
+
             if db_uri != 'sqlite:///:memory:' and db_uri.startswith('sqlite:///'):
                 db_path = db_uri.replace('sqlite:///', '')
                 if not os.path.isabs(db_path):
                     db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), db_path)
                     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
                     logger.debug(f'Using database at: {db_path}')
-                
+
                 db_dir = os.path.dirname(db_path)
                 logger.debug(f"Ensuring database directory exists: {db_dir}")
                 if not os.path.exists(db_dir):
                     logger.debug(f"Creating database directory: {db_dir}")
                     os.makedirs(db_dir, mode=0o777)
-                
+
                 if not os.path.exists(db_path):
                     logger.debug(f"Creating empty database file: {db_path}")
                     open(db_path, 'a').close()
                     os.chmod(db_path, 0o666)
-                
+
                 # Verify file permissions
                 st = os.stat(db_path)
                 logger.debug(f"Database file permissions: {oct(st.st_mode)}")
                 logger.debug(f"Database file owner: {st.st_uid}:{st.st_gid}")
-            
+
             # Import models to ensure they are registered with SQLAlchemy
             from .models import Secret
             logger.debug("Imported models")
-            
+
             # Drop all tables and recreate them
             logger.debug("Dropping all tables...")
             db.drop_all()
             logger.debug("Creating database tables...")
             db.create_all()
             logger.info("Database initialization completed successfully")
-            
+
             # Test database connection and verify table exists
             result = db.session.execute(text('SELECT name FROM sqlite_master WHERE type="table" AND name="secrets"')).fetchone()
             if result:
@@ -161,7 +165,7 @@ def create_app(test_config=None):
             else:
                 logger.error("Secrets table was not created")
                 raise Exception("Failed to create secrets table")
-            
+
             # Test basic database operations
             test_secret = Secret(secret="test", expiration=datetime.now(timezone.utc) + timedelta(minutes=5))
             db.session.add(test_secret)
@@ -170,7 +174,7 @@ def create_app(test_config=None):
             db.session.delete(test_secret)
             db.session.commit()
             logger.debug("Test secret deleted successfully")
-            
+
         except sqlalchemy.exc.OperationalError as e:
             logger.error(f"Database operational error: {str(e)}", exc_info=True)
             raise
@@ -181,7 +185,7 @@ def create_app(test_config=None):
     # Register blueprints and routes
     from . import routes
     app.register_blueprint(routes.bp)
-    
+
     # Configure session
     @app.before_request
     def before_request():
@@ -195,17 +199,6 @@ def create_app(test_config=None):
         """Log after each request."""
         app.logger.debug(f'Response headers: {dict(response.headers)}')
         return response
-    
-    # Configure security headers
-    @app.after_request
-    def add_security_headers(response):
-        """Add security headers to response."""
-        if not app.debug:  # Only add security headers in production
-            response.headers['X-Content-Type-Options'] = 'nosniff'
-            response.headers['X-Frame-Options'] = 'DENY'
-            response.headers['X-XSS-Protection'] = '1; mode=block'
-            response.headers['Content-Security-Policy'] = "default-src 'self'"
-        return response
 
     # Start scheduler only in production
     if not app.debug and not app.testing:
@@ -216,7 +209,7 @@ def create_app(test_config=None):
             minutes=60
         )
         scheduler.start()
-    
+
     # Register teardown
     @app.teardown_appcontext
     def shutdown_scheduler(exception=None):

@@ -3,14 +3,14 @@ from datetime import datetime, timedelta, timezone
 import html
 from flask import (
     Blueprint, flash, g, redirect, render_template,
-    request, url_for, abort, jsonify, current_app
+    request, url_for, abort, jsonify, current_app, make_response
 )
 from werkzeug.exceptions import RequestEntityTooLarge
 from sqlalchemy import text
 from . import db, limiter
 from .models import Secret
 
-bp = Blueprint('onetimeshare', __name__)
+bp = Blueprint('onetimeshare', __name__, url_prefix='')
 
 @bp.route('/')
 def home():
@@ -24,33 +24,59 @@ def home():
 def add_secret():
     """Create a new secret."""
     try:
-        secret = request.form.get('secret', '').strip()
-        if not secret:
-            return jsonify({'error': 'Secret cannot be empty'}), 400
+        if not request.form.get('secret'):
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Secret is required'}), 400
+            flash('Secret is required', 'error')
+            return redirect(url_for('onetimeshare.home'))
+
+        expiration = request.form.get('expiration')
+        if not expiration:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Expiration time is required'}), 400
+            flash('Expiration time is required', 'error')
+            return redirect(url_for('onetimeshare.home'))
 
         try:
-            expiration_str = request.form.get('expiration')
-            expiration = datetime.strptime(expiration_str, '%Y-%m-%dT%H:%M')
-            expiration = expiration.replace(tzinfo=timezone.utc)
-        except (ValueError, TypeError):
-            return jsonify({'error': 'Invalid expiration format'}), 400
+            # Parse the datetime and make it timezone-aware
+            expiration = datetime.fromisoformat(expiration).replace(tzinfo=timezone.utc)
+        except ValueError:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Invalid expiration time format'}), 400
+            flash('Invalid expiration time format', 'error')
+            return redirect(url_for('onetimeshare.home'))
 
         if expiration <= datetime.now(timezone.utc):
-            return jsonify({'error': 'Expiration must be in the future'}), 400
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Expiration time must be in the future'}), 400
+            flash('Expiration time must be in the future', 'error')
+            return redirect(url_for('onetimeshare.home'))
 
-        secret_obj = Secret(secret=secret, expiration=expiration)
-        secret_obj.save()
+        secret = Secret(secret=request.form['secret'], expiration=expiration)
+        db.session.add(secret)
+        db.session.commit()
 
-        return jsonify({
-            'message': 'Secret created successfully',
-            'url': url_for('onetimeshare.get_secret', sid=secret_obj.sid, _external=True)
-        }), 200
+        secret_url = url_for('onetimeshare.get_secret', sid=secret.sid, _external=True)
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'url': secret_url})
+        
+        return render_template('index.html', 
+                            url=secret_url,
+                            now=datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M'),
+                            suggested=(datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M'))
 
     except RequestEntityTooLarge:
-        return jsonify({'error': 'Secret too large'}), 413
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'Secret too large'}), 413
+        flash('Secret too large', 'error')
+        return redirect(url_for('onetimeshare.home'))
     except Exception as e:
         current_app.logger.error(f"Error creating secret: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'Internal server error'}), 500
+        flash('An error occurred while creating the secret', 'error')
+        return redirect(url_for('onetimeshare.home'))
 
 @bp.route('/secret/<sid>')
 def get_secret(sid):
@@ -58,12 +84,18 @@ def get_secret(sid):
     secret = Secret.query.filter_by(sid=sid).first()
     
     if not secret:
-        return jsonify({'error': 'Secret not found'}), 404
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'Secret not found'}), 404
+        flash('Secret not found', 'error')
+        return redirect(url_for('onetimeshare.home'))
 
     if secret.is_expired():
         db.session.delete(secret)
         db.session.commit()
-        return jsonify({'error': 'Secret has expired'}), 410
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'Secret has expired'}), 410
+        flash('Secret has expired', 'error')
+        return redirect(url_for('onetimeshare.home'))
 
     # Get the secret before deleting and escape HTML
     secret_text = html.escape(secret.secret)
@@ -72,7 +104,10 @@ def get_secret(sid):
     db.session.delete(secret)
     db.session.commit()
 
-    return jsonify({'secret': secret_text}), 200
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'secret': secret_text})
+    
+    return render_template('secret.html', secret=secret_text)
 
 @bp.route('/health')
 def health_check():
