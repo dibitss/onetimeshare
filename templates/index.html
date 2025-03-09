@@ -16,7 +16,7 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <form method="POST" action="{{ url_for('add_secret') }}">
+        <form method="POST" action="{{ url_for('onetimeshare.add_secret') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <textarea name="secret" placeholder="Enter your secret message here..." required rows="4"></textarea>
             <input type="datetime-local" name="expiration" min="{{now}}" value="{{suggested}}" required>

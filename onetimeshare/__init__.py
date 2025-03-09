@@ -12,7 +12,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from apscheduler.schedulers.background import BackgroundScheduler
 from sqlalchemy import text
 import sqlalchemy.exc
@@ -52,7 +52,9 @@ def create_app(test_config=None):
         SQLALCHEMY_ECHO=True,
         MAX_CONTENT_LENGTH=16 * 1024,  # 16KB
         ENCRYPTION_KEY=os.environ.get('ENCRYPTION_KEY', Fernet.generate_key().decode()),
-        PERMANENT_SESSION_LIFETIME=timedelta(minutes=5)
+        PERMANENT_SESSION_LIFETIME=timedelta(minutes=5),
+        WTF_CSRF_ENABLED=True,  # Enable CSRF protection by default
+        WTF_CSRF_TIME_LIMIT=3600  # 1 hour CSRF token expiry
     )
 
     # Generate a Fernet key if not provided
@@ -70,7 +72,7 @@ def create_app(test_config=None):
             key = Fernet.generate_key()
             app.config['ENCRYPTION_KEY'] = key.decode()
 
-    # Test configuration if provided
+    # Load test config if passed in
     if test_config is not None:
         app.config.update(test_config)
     
@@ -85,29 +87,15 @@ def create_app(test_config=None):
     
     # Initialize extensions
     db.init_app(app)
-    csrf.init_app(app)
+    csrf.init_app(app)  # Initialize CSRF protection
     limiter.init_app(app)
+    talisman.init_app(app)
     
-    # Only enable Talisman in production
-    if not app.debug and not app.testing:
-        talisman.init_app(
-            app,
-            force_https=True,
-            strict_transport_security=True,
-            strict_transport_security_max_age=31536000,
-            strict_transport_security_include_subdomains=True,
-            frame_options='DENY',
-            frame_options_allow_from=None,
-            content_security_policy={
-                'default-src': "'self'",
-                'script-src': "'self'",
-                'style-src': "'self' 'unsafe-inline'",
-                'img-src': "'self' data:",
-                'font-src': "'self' data:",
-            },
-            content_security_policy_nonce_in=['script-src'],
-            session_cookie_secure=True
-        )
+    # Register error handlers
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(e):
+        """Handle CSRF errors."""
+        return jsonify({'error': 'CSRF token missing or invalid'}), 400
     
     # Configure logging
     if not app.debug and not app.testing:
@@ -125,7 +113,7 @@ def create_app(test_config=None):
         app.logger.addHandler(file_handler)
         app.logger.setLevel(logging.INFO)
         app.logger.info('OneTimeShare startup')
-    
+
     # Initialize database
     with app.app_context():
         try:
@@ -189,12 +177,10 @@ def create_app(test_config=None):
         except Exception as e:
             logger.error(f"Unexpected error during database initialization: {str(e)}", exc_info=True)
             raise
-    
+
     # Register blueprints and routes
     from . import routes
-    app.add_url_rule('/', 'add_secret', limiter.limit("10 per second")(routes.add_secret), methods=['GET', 'POST'])
-    app.add_url_rule('/<sid>', 'get_secret', limiter.limit("10 per second")(routes.get_secret))
-    app.add_url_rule('/health', 'health_check', limiter.exempt(routes.health_check))
+    app.register_blueprint(routes.bp)
     
     # Configure session
     @app.before_request
@@ -203,7 +189,7 @@ def create_app(test_config=None):
         if 'initialized' not in session:
             session['initialized'] = True
             session.permanent = True
-            
+
     @app.after_request
     def after_request(response):
         """Log after each request."""
@@ -220,7 +206,7 @@ def create_app(test_config=None):
             response.headers['X-XSS-Protection'] = '1; mode=block'
             response.headers['Content-Security-Policy'] = "default-src 'self'"
         return response
-    
+
     # Start scheduler only in production
     if not app.debug and not app.testing:
         from .models import Secret
@@ -237,11 +223,16 @@ def create_app(test_config=None):
         """Shut down the scheduler when the app context tears down."""
         if scheduler.running:
             scheduler.shutdown()
-    
+
     @app.errorhandler(Exception)
     def handle_error(error):
         """Log all errors."""
         app.logger.error(f'Unhandled error: {error}', exc_info=True)
         return 'An error occurred', 500
-    
+
+    @app.errorhandler(413)
+    def handle_request_entity_too_large(e):
+        """Handle request entity too large errors."""
+        return jsonify({'error': 'Secret too large'}), 413
+
     return app

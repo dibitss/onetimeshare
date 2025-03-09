@@ -12,8 +12,8 @@
     ░ ░           ░    ░  ░         ░         ░      ░  ░      ░   ░  ░  ░      ░  ░   ░        ░  ░
 ```
 
-[![Tests](https://github.com/yourusername/onetimeshare/actions/workflows/tests.yml/badge.svg)](https://github.com/yourusername/onetimeshare/actions/workflows/tests.yml)
-[![codecov](https://codecov.io/gh/yourusername/onetimeshare/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/onetimeshare)
+[![Tests](https://github.com/dibitss/onetimeshare/actions/workflows/tests.yml/badge.svg)](https://github.com/dibitss/onetimeshare/actions/workflows/tests.yml)
+[![codecov](https://codecov.io/gh/dibitss/onetimeshare/branch/main/graph/badge.svg)](https://codecov.io/gh/dibitss/onetimeshare)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 

@@ -1,10 +1,12 @@
 """Routes for OneTimeShare application."""
 from datetime import datetime, timedelta, timezone
+import html
 from flask import (
     Blueprint, flash, g, redirect, render_template,
     request, url_for, abort, jsonify, current_app
 )
 from werkzeug.exceptions import RequestEntityTooLarge
+from sqlalchemy import text
 from . import db, limiter
 from .models import Secret
 
@@ -13,7 +15,9 @@ bp = Blueprint('onetimeshare', __name__)
 @bp.route('/')
 def home():
     """Render the home page."""
-    return render_template('home.html')
+    now = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M')
+    suggested = (datetime.now(timezone.utc) + timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M')
+    return render_template('index.html', now=now, suggested=suggested)
 
 @bp.route('/create', methods=['POST'])
 @limiter.limit("10 per minute")
@@ -61,8 +65,8 @@ def get_secret(sid):
         db.session.commit()
         return jsonify({'error': 'Secret has expired'}), 410
 
-    # Get the secret before deleting
-    secret_text = secret.secret
+    # Get the secret before deleting and escape HTML
+    secret_text = html.escape(secret.secret)
     
     # Delete the secret
     db.session.delete(secret)
@@ -75,7 +79,7 @@ def health_check():
     """Check the health of the application."""
     try:
         # Test database connection
-        db.session.execute('SELECT 1')
+        db.session.execute(text('SELECT 1'))
         return jsonify({'status': 'healthy'}), 200
     except Exception as e:
         current_app.logger.error(f"Health check failed: {e}")
