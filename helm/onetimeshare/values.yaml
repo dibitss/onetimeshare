@@ -63,6 +63,8 @@ persistence:
   size: 1Gi
 
 config:
+  flaskConfig: "docker"  # can be "development", "docker", or "testing"
+  flaskDebug: false
   maxSecretSize: 10240  # 10KB
   workerCount: 4
   cleanupInterval: 3600  # 1 hour in seconds

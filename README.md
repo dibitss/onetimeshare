@@ -5,14 +5,14 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 
-A secure, cyberpunk-themed secret sharing service that allows you to share sensitive information through one-time-use links. Once a secret is viewed, it's permanently deleted from the system.
+A secure secret sharing service that allows you to share sensitive information through one-time-use links. Once a secret is viewed, it's permanently deleted from the system.
 
 ## 🌟 Features
 
 - 🔒 End-to-end encryption of secrets
 - ⏰ Time-based expiration
 - 🔥 One-time access (secrets are deleted after viewing)
-- 🎨 Cyberpunk-themed UI with dark mode
+- 🎨 Modern UI with dark mode
 - 🛡️ Rate limiting and CSRF protection
 - 🔍 Health monitoring
 - 🧹 Automatic cleanup of expired secrets
@@ -231,4 +231,3 @@ The application provides:
 
 - Inspired by various secret sharing services
 - Built with Flask and SQLAlchemy
-- Cyberpunk theme inspiration from the cyberpunk genre

@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: onetimeshare
+  tag: latest
+  pullPolicy: Never  # Use local image
+
+service:
+  type: NodePort
+  port: 5000
+  nodePort: 30001
+
+config:
+  flaskConfig: "docker"
+  flaskDebug: false
+  database:
+    type: postgresql
+
+secrets:
+  secretKey: "minikube-dev-secret-key"
+  encryptionKey: "minikube-dev-encryption-key"
+
+postgresql:
+  enabled: true
+  auth:
+    username: onetimeshare
+    password: onetimeshare
+    database: onetimeshare
+  primary:
+    persistence:
+      enabled: true
+      size: 1Gi
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi 
