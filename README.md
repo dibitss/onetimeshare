@@ -154,6 +154,40 @@ helm install onetimeshare ./helm/onetimeshare \
   --values ./secrets.yaml
 ```
 
+#### Minikube Deployment
+
+For local development with Minikube:
+
+1. Start Minikube:
+```bash
+minikube start
+```
+
+2. Build and load the Docker image:
+```bash
+docker build -t onetimeshare:latest .
+minikube image load onetimeshare:latest
+```
+
+3. Install the Helm chart using the Minikube values:
+```bash
+helm install onetimeshare ./helm/onetimeshare \
+  --values ./helm/onetimeshare/minikube-values.yaml \
+  --create-namespace \
+  --namespace onetimeshare
+```
+
+4. Access the application:
+```bash
+minikube service onetimeshare -n onetimeshare
+```
+
+The Minikube configuration includes:
+- Local image usage with `pullPolicy: Never`
+- PostgreSQL with simple development credentials
+- NodePort service for easy access
+- Development-friendly resource limits
+
 #### Helm Configuration Options
 
 | Parameter | Description | Default |
