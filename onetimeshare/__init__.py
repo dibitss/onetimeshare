@@ -6,6 +6,7 @@ from datetime import timedelta, datetime, timezone
 import secrets
 from cryptography.fernet import Fernet
 import base64
+import sqlite3
 
 from flask import Flask, session, render_template, request, abort, flash, url_for, jsonify, current_app, redirect
 from flask_sqlalchemy import SQLAlchemy
@@ -14,14 +15,27 @@ from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from apscheduler.schedulers.background import BackgroundScheduler
-from sqlalchemy import text, inspect
+from sqlalchemy import text, inspect, event
 import sqlalchemy.exc
 
 from config import config
+from .cli import main as cli_main
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+def adapt_datetime(dt):
+    """Convert datetime to ISO format string for SQLite."""
+    return dt.isoformat()
+
+def convert_datetime(s):
+    """Convert ISO format string to datetime from SQLite."""
+    return datetime.fromisoformat(s.decode())
+
+# Register the adapter and converter with SQLite
+sqlite3.register_adapter(datetime, adapt_datetime)
+sqlite3.register_converter("datetime", convert_datetime)
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -46,7 +60,7 @@ def create_app(test_config=None):
         SECRET_KEY=os.environ.get('SECRET_KEY', os.urandom(32).hex()),
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'DATABASE_URL',
-            'sqlite:///data/onetimeshare.db'
+            'sqlite:///data/onetimeshare.db?detect_types=PARSE_DECLTYPES'
         ),
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
         SQLALCHEMY_ECHO=True,
@@ -227,5 +241,8 @@ def create_app(test_config=None):
     def handle_request_entity_too_large(e):
         """Handle request entity too large errors."""
         return jsonify({'error': 'Secret too large'}), 413
+
+    # Register CLI commands
+    app.cli.add_command(cli_main)
 
     return app

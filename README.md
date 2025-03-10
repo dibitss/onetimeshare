@@ -110,7 +110,7 @@ docker build -t onetimeshare .
 ```bash
 docker run -d \
   --name onetimeshare \
-  -p 5001:5000 \
+  -p 5000:5000 \
   -e FLASK_APP=wsgi.py \
   -e FLASK_DEBUG=1 \
   -e SECRET_KEY=your-secure-secret-key \

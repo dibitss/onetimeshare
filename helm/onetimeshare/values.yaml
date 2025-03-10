@@ -72,14 +72,14 @@ config:
     type: sqlite  # can be "sqlite" or "postgresql"
     # SQLite configuration (used when type is "sqlite")
     sqlite:
-      path: "/data/onetimeshare.db"
+      path: "/app/data/onetimeshare.db"
     # PostgreSQL configuration (used when type is "postgresql")
     postgresql:
-      host: ""  # Set this when using external PostgreSQL
+      host: "onetimeshare-postgresql"  # Set this when using external PostgreSQL
       port: 5432
       database: "onetimeshare"
       user: "onetimeshare"
-      password: ""  # Set this when using external PostgreSQL
+      password: "onetimeshare"  # Set this when using external PostgreSQL
       sslMode: "require"
 
 # PostgreSQL subchart configuration
@@ -88,7 +88,7 @@ postgresql:
   auth:
     database: "onetimeshare"
     username: "onetimeshare"
-    password: ""  # Required when postgresql.enabled is true
+    password: "onetimeshare"  # Required when postgresql.enabled is true
   primary:
     persistence:
       enabled: true
@@ -98,8 +98,8 @@ postgresql:
       postgresql: 5432
 
 secrets:
-  secretKey: ""  # Required: Generate a secure secret key
-  encryptionKey: ""  # Required: Generate a secure encryption key
+  secretKey: "5439861001e7a1e13100bebdfbf32e2bd334cabff407a15a53d512a287ef15fc"  # Required: Generate a secure secret key
+  encryptionKey: "c84511a43dc6017f178cbefc3fe82473f3241bd9ca382cebcf5c5c35d5986ffe"  # Required: Generate a secure encryption key
 
 nodeSelector: {}
 

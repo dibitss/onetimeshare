@@ -6,7 +6,7 @@ import logging
 import html
 
 from flask import current_app
-from sqlalchemy import Unicode
+from sqlalchemy import Unicode, func
 from sqlalchemy.orm import validates
 
 from . import db
@@ -84,10 +84,17 @@ class Secret(db.Model):
         return datetime.now(timezone.utc) >= self._expiration
 
     @classmethod
+    def get_by_sid(cls, sid):
+        """Get a secret by its SID."""
+        return cls.query.filter_by(sid=sid).first()
+
+    @classmethod
     def cleanup_expired(cls):
         """Remove all expired secrets."""
+        from sqlalchemy import func
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
         expired = cls.query.filter(
-            cls._expiration <= datetime.now(timezone.utc)
+            func.datetime(cls._expiration) <= now
         ).all()
         for secret in expired:
             db.session.delete(secret)

@@ -24,7 +24,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "onetimeshare.serviceAccountName" . }}
+      serviceAccountName: {{ include "onetimeshare.name" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -51,6 +51,9 @@ spec:
             {{- if eq .Values.config.database.type "postgresql" }}
             - name: SQLALCHEMY_DATABASE_URI
               value: postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ include "onetimeshare.fullname" . }}-postgresql:{{ .Values.postgresql.service.ports.postgresql }}/{{ .Values.postgresql.auth.database }}
+            {{- else if eq .Values.config.database.type "sqlite" }}
+            - name: SQLALCHEMY_DATABASE_URI
+              value: sqlite:///{{ .Values.config.database.sqlite.path }}
             {{- end }}
           ports:
             - name: http

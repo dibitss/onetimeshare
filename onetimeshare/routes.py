@@ -81,33 +81,44 @@ def add_secret():
 @bp.route('/secret/<sid>')
 def get_secret(sid):
     """Retrieve and delete a secret."""
-    secret = Secret.query.filter_by(sid=sid).first()
-    
-    if not secret:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'error': 'Secret not found'}), 404
-        flash('Secret not found', 'error')
-        return redirect(url_for('onetimeshare.home'))
+    try:
+        secret = Secret.query.filter_by(sid=sid).first()
+        
+        if not secret:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Secret not found'}), 404
+            flash('Secret not found', 'error')
+            return redirect(url_for('onetimeshare.home'))
 
-    if secret.is_expired():
+        if secret.is_expired():
+            db.session.delete(secret)
+            db.session.commit()
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'error': 'Secret has expired'}), 410
+            flash('Secret has expired', 'error')
+            return redirect(url_for('onetimeshare.home'))
+
+        # Get the secret before deleting and escape HTML
+        secret_text = html.escape(secret.secret)
+        expiration = secret.expiration.isoformat()
+        
+        # Delete the secret
         db.session.delete(secret)
         db.session.commit()
+
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return jsonify({'error': 'Secret has expired'}), 410
-        flash('Secret has expired', 'error')
+            return jsonify({
+                'secret': secret_text,
+                'expiration': expiration
+            })
+        
+        return render_template('secret.html', secret=secret_text)
+    except Exception as e:
+        current_app.logger.error(f"Unhandled error: {e}")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'error': 'Internal server error'}), 500
+        flash('An error occurred while retrieving the secret', 'error')
         return redirect(url_for('onetimeshare.home'))
-
-    # Get the secret before deleting and escape HTML
-    secret_text = html.escape(secret.secret)
-    
-    # Delete the secret
-    db.session.delete(secret)
-    db.session.commit()
-
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({'secret': secret_text})
-    
-    return render_template('secret.html', secret=secret_text)
 
 @bp.route('/health')
 def health_check():
